@@ -1,0 +1,65 @@
+{{ block title }}
+    Memory Task
+{{ endblock }}
+
+{{ block styles }}
+<!-- Load the custom CSS styles -->
+<link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
+<link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="card bg-light m-3">
+    <div class="card-body">
+
+        <h3><i class="fas fa-brain"></i> Welcome to the Memory Task!</h3>
+
+        <p>
+            For this part of the experiment, you have <b>{{ time_limit|to0 }} minutes</b> starting now.
+        </p>
+
+        <p>
+            Your task is to memorize as many words from the list of <b>{{ num_words }}</b> words below as you can.
+            <strong>You are not allowed to write them down now.</strong>
+        </p>
+
+        <p>
+            After filling in a questionnaire, you will recall as many words as possible.
+            You will earn <b>{{ payoff_per_correct }}</b> for each correct word.
+            The order does not matter.
+        </p>
+
+        <p>
+            <input id="info_button2" type="button" value="&#xf178" onclick="button_click(info_button2, paragraph2);" />
+        </p>
+
+        <div id="paragraph2" class="hidden-paragraph">
+            <br>
+            <h3><i class="fas fa-list-ul"></i> Words to Memorize</h3>
+            <div class="card bg-white border rounded p-4">
+                <div class="row">
+                    {% for word in word_list %}
+                        <div class="col-3 text-center" style="font-size: 1.5rem; padding: 8px;">
+                            {{ word }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <p><em>The experiment will automatically proceed after {{ time_limit|to0 }} minutes.</em></p>
+        </div>
+
+    </div>
+</div>
+
+<div id="next" style="display: none">
+    {{ next_button }}
+</div>
+
+{{ endblock }}
+
+{% block scripts %}
+<!-- Load the custom JavaScript functions -->
+<script src="{% static 'global/myJs.js' %}"></script>
+{{ endblock }}

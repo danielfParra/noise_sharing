@@ -1,0 +1,63 @@
+{{ block title }}
+N-Back Results
+{{ endblock }}
+
+{{ block styles }}
+<!-- Load the custom CSS styles -->
+<link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
+<link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="card bg-light m-3">
+    <div class="card-body">
+
+        <p>
+            Thank you for completing this round. Below is a summary of your performance.
+        </p>
+
+        <h4>Performance Summary</h4>
+
+        <p>
+            Your response was correct for <b>{{ correct_count }}</b> out of <b>{{ total_count }}</b> items.
+        </p>
+
+        <p>
+            <b>False Positives:</b> {{ false_positives }} <br>
+            <b>False Negatives:</b> {{ false_negatives }}
+        </p>
+
+        <h4>Payoff Calculation</h4>
+
+        <p>
+            Your total payoff is <b>{{ payoff|cu }}</b>.
+        </p>
+
+        <p>
+            You started with <b>40 points</b>. <br>
+            - <b>False Negatives:</b> -2 points each <br>
+            - <b>False Positives:</b> -1 point each <br>
+        </p>
+
+        <h4>Final Earnings</h4>
+
+        <p>
+            Your earnings, including any participation bonus, will be calculated as follows: <br>
+            <b>Total earnings:</b> {{ participant.payoff_plus_participation_fee|cu }}
+        </p>
+
+    </div>
+</div>
+
+<div>
+    {{ next_button }}
+</div>
+
+{{ endblock }}
+
+{% block scripts %}
+<!-- Load the custom JavaScript functions -->
+<script src="{% static 'global/myJs.js' %}"></script>
+<script src="https://kit.fontawesome.com/46026ecfac.js" crossOrigin="anonymous"></script>
+{% endblock %}

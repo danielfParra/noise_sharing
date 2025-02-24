@@ -1,0 +1,28 @@
+{{ block title }}
+    Results Summary
+{{ endblock }}
+
+{{ block styles }}
+<link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
+<link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+{{ endblock }}
+
+{{ block content }}
+
+<div class="card bg-light m-3">
+    <div class="card-body">
+        <h3><i class="fas fa-chart-line"></i> Your Performance</h3>
+
+        <p>You attempted to recall <b>{{ total_recalled }}</b> words.</p>
+        <p>You correctly recalled <b>{{ recall_correct }}</b> words.</p>
+        <p>Your total earnings from this task: <b>{{ earnings }}</b></p>
+
+        <p><em>Thank you for your participation!</em></p>
+    </div>
+</div>
+
+{{ next_button }}
+
+{{ endblock }}

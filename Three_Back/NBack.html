@@ -1,0 +1,202 @@
+{{ block title }}
+N-back task
+{{ endblock }}
+
+{{ block styles }}
+<link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
+<link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
+{{ endblock }}
+
+{{ block content }}
+<style>
+    .nback-container{
+        width: 600px;
+        height: 600px;
+        position: relative;
+        border: lightgrey solid 1px;
+        margin: auto;
+    }
+
+    .item {
+        font-size: 128px;
+        font-weight: bold;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.3s ease;
+        opacity: 0;
+    }
+
+.type_1 {
+    color: #FFC107; /* Yellow-Green */
+}
+
+.type_2 {
+    color: #7AD151; /* Green */
+}
+
+.type_3 {
+    color: #22A784; /* Teal */
+}
+
+.type_4 {
+    color: #414487; /* Dark Blue */
+}
+
+
+
+
+    .feedback {
+        font-size: 115px;
+        position: absolute;
+        font-weight: bold;
+        left: 50%;
+        top: 70%;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.2s ease;
+        opacity: 0;
+    }
+    #correct{
+        color: #28a745;
+    }
+    #incorrect{
+        color: #dc3545;
+    }
+
+</style>
+
+<div class="card bg-light border-dark mb-3 nback-container">
+    <div class="card-body">
+        <div class="card-text">
+            {% for item in player.item_sequence %}
+                <div id="id_{{ forloop.counter0 }}" class="item type_{{ item }}">
+                    {{ item }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="correct" class="feedback">&#10003;</div>
+        <div id="incorrect" class="feedback">&#10007;</div>
+    </div>
+</div>
+
+<!-- Formulario oculto para enviar los datos -->
+<form id="form" method="post">
+    {{ formfields }}
+    <input type="hidden" name="responses" id="responses_input">
+    <input type="hidden" name="correct" id="correct_input">
+    <button id="submit_btn" style="display:none;">Submit</button>
+</form>
+
+<script>
+    const target_responses = js_vars.target_responses;
+    const num_trials = target_responses.length;
+    const trialDuration = {{ C.trialDuration }};
+    const intertrialDuration = {{ C.intertrialDuration }};
+    let round = -1;
+    let startTime;
+    let responses = Array(num_trials).fill(0);
+    let correct = Array(num_trials).fill(1);
+    let falsePositives = Array(num_trials).fill(0);
+    let falseNegatives = Array(num_trials).fill(0);
+    let taskCompleted = false;
+
+    // 🔹 Prevent scrolling when pressing spacebar
+    window.addEventListener("keydown", function(e) {
+        if (e.keyCode === 32) {
+            e.preventDefault();  // Stops scrolling
+        }
+    }, false);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(play_round, 1000);
+    });
+
+    function play_round() {
+        round += 1;
+
+        if (round == num_trials) {
+            console.log("✅ Todos los intentos completados. Enviando formulario.");
+
+            // Marcar como completado
+            taskCompleted = true;
+            $(window).unbind('beforeunload');
+
+            // Guardar respuestas antes de enviar
+            document.getElementById("responses_input").value = responses.join("");
+            document.getElementById("correct_input").value = correct.join("");
+
+            // Enviar formulario para avanzar a la siguiente página
+            document.getElementById("form").submit();
+            return;
+        }
+
+        let currentItem = document.getElementById("id_" + round);
+        currentItem.style.opacity = 1;
+        startTime = Date.now();
+
+        if (round >= {{ C.N }}) {
+            window.addEventListener("keydown", keypressed, false);
+        }
+
+        setTimeout(function() {
+            window.removeEventListener("keydown", keypressed, false);
+            currentItem.style.opacity = 0;
+
+            // 🔹 Capture false negatives (should have pressed but didn't)
+            if (target_responses[round] === 1 && responses[round] === 0) {
+                correct[round] = 0;
+                falseNegatives[round] = 1;  // Mark as false negative
+                liveSend({
+                    round_number: round,
+                    response: 0,  // No response
+                    is_correct: 0,
+                    response_time: null,
+                    false_positive: 0,  // Didn't press, so not a false positive
+                    false_negative: 1   // False negative (missed response)
+                });
+                flicker("incorrect");
+            }
+
+            setTimeout(play_round, intertrialDuration);
+        }, trialDuration);
+    }
+
+    function keypressed(e) {
+        if (e.keyCode == 32) {  // Spacebar
+            window.removeEventListener("keydown", keypressed, false);
+            let responseTime = Date.now() - startTime;
+            let is_correct = target_responses[round] === 1 ? 1 : 0;
+            let false_positive = target_responses[round] === 0 ? 1 : 0;  // Pressed when not needed
+            let false_negative = 0;  // Not possible if they pressed
+
+            responses[round] = 1;  // Mark response
+            if (!is_correct) {
+                correct[round] = 0;
+            }
+            if (false_positive) {
+                falsePositives[round] = 1;  // Mark as false positive
+            }
+
+            liveSend({
+                round_number: round,
+                response: 1,  // Spacebar pressed
+                is_correct: is_correct,
+                response_time: responseTime,
+                false_positive: false_positive,  // Capturing false positives
+                false_negative: false_negative   // Not a false negative if pressed
+            });
+
+            flicker(is_correct ? "correct" : "incorrect");
+        }
+    }
+
+    function flicker(item) {
+        document.getElementById(item).style.opacity = 1;
+        setTimeout(() => document.getElementById(item).style.opacity = 0, 300);
+    }
+
+</script>
+
+{{ endblock }}

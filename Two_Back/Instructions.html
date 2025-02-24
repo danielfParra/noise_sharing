@@ -1,0 +1,105 @@
+{{ block title }}
+   {{ n_back }}-Back Task
+{{ endblock }}
+
+{{ block styles }}
+<!-- Load the custom CSS styles -->
+<link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
+<link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+{{ endblock }}
+
+{{ block content }}
+
+<div class="card bg-light m-3">
+    <div class="card-body">
+
+        <h3><i class="fas fa-brain"></i> Welcome to the {{ n_back }}-Back Task!</h3>
+
+        <p>
+            In this game, you will see a series of numbers appearing one after the other.
+            The sequence consists of <b>{{ length }}</b> numbers in total.
+        </p>
+
+        <p>
+            Your job is to carefully watch the sequence and press the space bar <b>only</b> when the current number
+            is exactly the same as the number that appeared <b>{{ n_back }} steps earlier</b>.
+            You have time to react until the number disappears after <b>{{ trial_duration }} milliseconds</b>.
+        </p>
+
+        <p>
+            Pressing the space bar at the wrong time or failing to press it when needed both count as errors.
+            If you make an error, <b>&#10007;</b> will appear, and if your response is correct, <b>&#10003;</b> will show.
+        </p>
+
+        <p>
+            <input id="info_button2" type="button" value="&#xf178" onclick="button_click(info_button2, paragraph2);" />
+        </p>
+
+        <div id="paragraph2" class="hidden-paragraph">
+            <br>
+
+            <h3><i class="fas fa-gamepad"></i> How to Play</h3>
+            <ul>
+                <li><i class="fas fa-eye"></i> For each new number, remember the number that appeared <b>{{ n_back }}</b> items ago.</li>
+                <li><i class="fas fa-hand-pointer"></i> If the current number is the same as the number <b>{{ n_back }}</b> items before, press the space bar.</li>
+                <li><i class="fas fa-ban"></i> If it is not the same, do not press anything.</li>
+            </ul>
+
+            <p>
+                <input id="info_button3" type="button" value="&#xf178" onclick="button_click(info_button3, paragraph3);" />
+            </p>
+        </div>
+
+        <div id="paragraph3" class="hidden-paragraph">
+            <br>
+
+            <h3><i class="fas fa-star"></i> Scoring System</h3>
+
+            <p>
+                You start with <b>{{ starting_points }} points</b>, which we will later convert into pesos.
+            </p>
+
+            <ul>
+                <li><i class="fas fa-times-circle"></i> If you miss a target (not pressing the space bar when you should), you lose <b>{{ penalty_miss }} points</b>.</li>
+                <li><i class="fas fa-ban"></i>If you press the space bar by mistake (when the current number does not match <b>{{ n_back }}</b> items ago), you lose <b>{{ penalty_wrong_press }} points</b>.</li>
+                <li>
+                     <i class="fas fa-exclamation-triangle"></i> <b>Important:</b> Pressing the space bar for every number or never pressing at all will both lead to losing <b>{{ penalty_spam }} points</b>.
+                    Try to be careful and only press when you are sure!
+                </li>
+            </ul>
+
+            <p>
+                <input id="info_button4" type="button" value="&#xf178" onclick="buttonAppear(); button_click(info_button4, paragraph4);" />
+            </p>
+        </div>
+
+        <div id="paragraph4" class="hidden-paragraph">
+            <h3><i class="fas fa-bullseye"></i> What to Aim For</h3>
+
+            <ul>
+                <li><i class="fas fa-eye"></i> <b>Be attentive:</b> Watch each number carefully.</li>
+                <li><i class="fas fa-check-circle"></i> <b>Make your decision:</b> Only press the space bar when you notice a match.</li>
+                <li><i class="fas fa-coins"></i> <b>Keep your points:</b> Your goal is to finish the game with as many points as possible.</li>
+            </ul>
+
+            <p>
+                Try your best, and good luck!
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<div id="next" style="display: none">
+    {{ next_button }}
+</div>
+
+{{ endblock }}
+
+
+{% block scripts %}
+<!-- Load the custom JavaScript functions -->
+<script src="{% static 'global/myJs.js' %}"></script>
+<script src="https://kit.fontawesome.com/46026ecfac.js" crossorigin="anonymous"></script>
+{% endblock %}

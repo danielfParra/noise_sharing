@@ -14,11 +14,29 @@ class C(BaseConstants):
 class Subsession(BaseSubsession):
     pass
 
+def creating_session(subsession):
+    round_sequences = {
+        1: "13442111124111232332131212421314422243443423131",
+        2: "32323443323233314231144414314232313432423223324",
+        3: "11143232431344311433443121244412111212123223332",
+        4: "34432344342424413133414212131314441241422113442",
+        5: "11444244224332224243122223132112131314131433233", # Length: 47, 2-back targets: 15
+    }
+    sequence_for_round = round_sequences.get(subsession.round_number, "")
+    print(f"Assigning sequences for round {subsession.round_number}")
+
+    for player in subsession.get_players():
+        player.item_sequence = sequence_for_round
+        print(f"Player {player.id_in_subsession} sequence: {player.item_sequence}")
+
+
+
 class Group(BaseGroup):
     pass
 
 class Player(BasePlayer):
-    item_sequence = models.StringField(initial="12132312134312134312134312132312132312134312")
+    item_sequence = models.StringField(initial="") #Length: 47,  2-back targets: 15
+
 
     # fields to store summary statistics
     total_correct = models.IntegerField()
@@ -26,6 +44,8 @@ class Player(BasePlayer):
     avg_response_time = models.FloatField()
     false_positives = models.IntegerField()  # Count of incorrect presses
     false_negatives = models.IntegerField()  # Count of missed presses
+
+    target_response_times = models.StringField(blank=True) #all response times of target items
 
     final_score = models.CurrencyField()
 
@@ -39,10 +59,14 @@ def set_payoffs(group):
         # Compute payoff using cu()
         starting_points = cu(40)  # Start with 40 currency units
         penalty = cu((false_negatives * 2) + (false_positives * 1))  # Calculate penalty
-        final_score = max(cu(12), starting_points - penalty)  # Prevents going below 12
+        final_score = max(cu(0), starting_points - penalty)  # Prevents going below 0
 
         # Store in oTree's built-in `payoff` field
         player.payoff = final_score
+
+    # With 47 digits, 15 targets, and 30 non-targets (after the first 2 digits), the payoff structure is perfectly balanced:
+   # Missing all targets or false alarming on all non-targets gives exactly the same penalty.
+
 
 class Trial(ExtraModel):
     """Stores each trial separately instead of using a string."""
@@ -57,6 +81,10 @@ class Trial(ExtraModel):
 
 class Instructions(Page):
     @staticmethod
+    def is_displayed(player):
+        return player.round_number == 1
+
+    @staticmethod
     def vars_for_template(player):
         trials = Trial.filter(player=player)
         sequence = player.item_sequence
@@ -65,12 +93,16 @@ class Instructions(Page):
         return {
             "length": len(sequence),
             "n_back": n_back,
-            "trial_duration": C.trialDuration,
+            "trial_duration": C.trialDuration/1000,
             "starting_points": 40,
             "penalty_miss": 2,
             "penalty_wrong_press": 1,
-            "penalty_spam": 28
+            "penalty_spam": 30 # Penalty for spamming spacebar or inaction
         }
+
+class countdown(Page):
+    timeout_seconds = 5
+    timer_text = 'The task starts in:'
 
 
 class NBack(Page):
@@ -128,6 +160,8 @@ class Results(Page):
             "total_count": total_trials,
             "false_positives": false_positives,
             "false_negatives": false_negatives,
+            "lost_false_negatives": false_negatives*2,
+            "lost_false_positives": false_positives*1,
             "payoff": player.payoff,  # Fetching calculated payoff
         }
 
@@ -137,6 +171,22 @@ class Results(Page):
         trials = Trial.filter(player=player)
         sequence = player.item_sequence  # Get the sequence string
         n_back = C.N  # Use the configured N value
+
+        # Filter and collect response times for target items
+        target_response_times = []
+        for trial in trials:
+            # Check if this is a target item
+            if (trial.round_number >= n_back and
+                    sequence[trial.round_number] == sequence[trial.round_number - n_back]):
+                # Store the response time if not None
+                if trial.response_time is not None:
+                    target_response_times.append(str(trial.response_time))
+
+        # Store target response times as a comma-separated string
+        player.target_response_times = ','.join(target_response_times)
+
+        # Optional: print to verify
+        print(f"Target Response Times: {player.target_response_times}")
 
         # ✅ Compute total expected trials directly from item_sequence
         total_trials = sum(1 for i in range(n_back, len(sequence)) if sequence[i] == sequence[i - n_back])
@@ -161,4 +211,4 @@ class Results(Page):
         player.false_negatives = false_negatives
 
 
-page_sequence = [Instructions, NBack, ResultsWaitPage, Results]
+page_sequence = [Instructions, countdown, NBack, ResultsWaitPage, Results]

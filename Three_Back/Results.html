@@ -1,8 +1,9 @@
 {{ block title }}
-N-Back Results
+3-Back Results - Round {{ player.round_number }}
 {{ endblock }}
 
 {{ block styles }}
+
 <!-- Load the custom CSS styles -->
 <link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
 <link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
@@ -10,44 +11,42 @@ N-Back Results
 
 {{ block content }}
 
-<div class="card bg-light m-3">
+
+<div class="card border-dark mb-3">
+
     <div class="card-body">
 
-        <p>
-            Thank you for completing this round. Below is a summary of your performance.
+        <p style="text-align: center;"> Thank you for completing round {{ player.round_number }}. Below is a summary of your performance. </p>
+
+        <hr>
+
+        <p class="blocktext">
+            You responded correctly to <span class="payoff">{{ correct_count }}</span> out of <span class="payoff">{{ total_count }}</span> items.
         </p>
 
-        <h4>Performance Summary</h4>
-
-        <p>
-            Your response was correct for <b>{{ correct_count }}</b> out of <b>{{ total_count }}</b> items.
+        <p class="blocktext">
+            <b>False Positives:</b> <span class="payoff">{{ false_positives }}</span> &nbsp; | &nbsp;
+            <b>False Negatives:</b> <span class="payoff">{{ false_negatives }}</span>
         </p>
 
-        <p>
-            <b>False Positives:</b> {{ false_positives }} <br>
-            <b>False Negatives:</b> {{ false_negatives }}
+        <hr>
+
+        <h5 class="blocktext">Payoff Calculation</h5>
+
+        <p class="blocktext">
+            You started with <span class="payoff">50 points</span>. <br>
+            <b>False Negatives:</b> you lost {{lost_false_negatives}} points<br>
+            <b>False Positives:</b> you lost {{lost_false_positives}} points
         </p>
 
-        <h4>Payoff Calculation</h4>
-
-        <p>
-            Your total payoff is <b>{{ payoff|cu }}</b>.
+        <p class="blocktext">
+            <strong>Your total payoff:</strong> <span class="payoff">{{ payoff|cu }}</span>
         </p>
 
-        <p>
-            You started with <b>40 points</b>. <br>
-            - <b>False Negatives:</b> -2 points each <br>
-            - <b>False Positives:</b> -1 point each <br>
-        </p>
-
-        <h4>Final Earnings</h4>
-
-        <p>
-            Your earnings, including any participation bonus, will be calculated as follows: <br>
-            <b>Total earnings:</b> {{ participant.payoff_plus_participation_fee|cu }}
-        </p>
+        <br>
 
     </div>
+
 </div>
 
 <div>
@@ -61,3 +60,9 @@ N-Back Results
 <script src="{% static 'global/myJs.js' %}"></script>
 <script src="https://kit.fontawesome.com/46026ecfac.js" crossOrigin="anonymous"></script>
 {% endblock %}
+
+
+
+
+
+

@@ -24,13 +24,14 @@
         <p>
             Your job is to carefully watch the sequence and press the space bar <b>only</b> when the current number
             is exactly the same as the number that appeared <b>{{ n_back }} steps earlier</b>.
-            You have time to react until the number disappears after <b>{{ trial_duration }} milliseconds</b>.
+            You have time to react until the number disappears after <b>{{ trial_duration }} seconds</b>.
         </p>
 
         <p>
             Pressing the space bar at the wrong time or failing to press it when needed both count as errors.
-            If you make an error, <b>&#10007;</b> will appear, and if your response is correct, <b>&#10003;</b> will show.
+            If you make an error, <b style="color: red;">&#10007;</b> will appear, and if your response is correct, <b style="color: green;">&#10003;</b> will show.
         </p>
+
 
         <p>
             <input id="info_button2" type="button" value="&#xf178" onclick="button_click(info_button2, paragraph2);" />

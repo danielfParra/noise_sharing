@@ -19,7 +19,14 @@ SESSION_CONFIGS = [
         num_demo_participants=1,
         app_sequence=['Memory_Task']
     ),
+    dict(
+        name='2_Memory_3',  # New task
+        display_name="2back - Memory - 3back",
+        num_demo_participants=1,
+        app_sequence=['welcome', 'Two_Back','Memory_Task', 'Three_Back','payment_info']
+    ),
 ]
+
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
 # in SESSION_CONFIGS, except those that explicitly override it.
@@ -27,7 +34,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=1.00, participation_fee=0.00, doc=""
+    real_world_currency_per_point=100.00, participation_fee=5000.00, doc=""
 )
 
 PARTICIPANT_FIELDS = []

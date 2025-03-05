@@ -1,0 +1,32 @@
+{{ block title }}
+Thank you for participation in this study!
+{{ endblock }}
+
+{{ block styles }}
+<!-- Load the custom css styles -->
+<link rel="stylesheet" href="{% static 'global/myStyle.css' %}">
+<link rel="stylesheet" href="{% static 'global/myStyleButton.css' %}">
+
+{{ endblock }}
+
+{{ block content }}
+
+
+<div class="card bg-light border-dark mb-3">
+  <div class="card-body">
+    <p class="card-text"> <h5> You will receive <span class="payoff"> {{ payoff }} </span>  based on your performance on the tasks.
+  </h5></p>
+
+
+  </div></div>
+      <br>
+
+<!--
+<div class="callout callout-danger">
+    <strong>Important:</strong> Your earnings will only count in your final payoffs if this round is payoff-relevant to you.
+    Remember that half of the rounds are payoff-relevant.
+</div>
+-->
+    {{ next_button }}
+
+{{ endblock }}

@@ -7,7 +7,7 @@ class C(BaseConstants):
 
     # Memory Task Constants
     NUM_WORDS = 20  # Total words in the list
-    PAYOFF_PER_CORRECT_WORD = cu(1)  # Payoff per correct word
+    PAYOFF_PER_CORRECT_WORD = cu(2)  # Payoff per correct word
     TIME_LIMIT_MEMORY = 240  # 4 minutes
 
     # Logic Task Constants
